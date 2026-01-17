@@ -1,0 +1,29 @@
+name: Manual Build VisionOS
+
+on:
+  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой
+  push:
+    tags:
+      - 'v*' # Оставляем, чтобы при создании тега тоже собиралось автоматически (по желанию)
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Compile EXE
+        run: |
+          g++ *.cpp -o VisionOS.exe -static -lws2_32 -lpthread
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisionOS-Executable
+          path: VisionOS.exe
